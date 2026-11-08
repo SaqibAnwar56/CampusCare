@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, priority_badge, empty, stat with context %}
+{% block title %}My Tasks{% endblock %}
+{% block heading %}My Tasks{% endblock %}
+{% block subheading %}Ordered by priority, then by target resolution time{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">{{ stat('inbox', stats.pending, 'Waiting to start', 'warn') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('tools', stats.in_progress, 'In progress', 'ind') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('alarm', stats.overdue, 'Overdue', 'bad') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('check2-all', stats.completed, 'Completed to date', 'ok') }}</div>
+</div>
+<div class="cc-card"><div class="card-h"><h2>Active assignments</h2><a href="{{ url_for('staff.history') }}">Task history</a></div>
+{% if tasks %}<div class="table-responsive"><table class="table cc-table"><thead><tr><th>Reference</th><th>Task</th><th>Location</th><th>Category</th><th>Priority</th><th>Status</th><th>Due</th><th></th></tr></thead><tbody>
+{% for r in tasks %}<tr><td class="ref">{{ r.reference_id }}</td><td>{{ r.title }}</td><td>{{ r.building }}<br><small class="text-muted">{{ r.location }}</small></td><td>{{ r.category }}</td>
+<td>{{ priority_badge(r.priority) }}</td><td>{{ status_badge(r.status) }}</td>
+<td class="small {{ 'text-danger fw-semibold' if r.is_overdue }}">{{ r.due_at|localtime('%d %b, %H:%M') }}{% if r.is_overdue %}<br><span class="pill overdue-tag">Overdue</span>{% endif %}</td>
+<td class="text-end"><a class="btn btn-sm btn-primary" href="{{ url_for('main.detail', ref=r.reference_id) }}">{{ 'Start' if r.status == 'Assigned' else 'Update' }}</a></td></tr>{% endfor %}</tbody></table></div>
+{% else %}{{ empty('emoji-smile', 'No active tasks', 'You are all caught up. New assignments from the administrator will appear here.') }}{% endif %}</div>
+{% endblock %}

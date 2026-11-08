@@ -1,0 +1,15 @@
+{% macro status_badge(s) %}<span class="pill st-{{ s|slug }}">{{ s }}</span>{% endmacro %}
+{% macro priority_badge(p) %}<span class="pill pr-{{ p|slug }}">{% if p == 'Critical' %}<i class="bi bi-exclamation-octagon-fill"></i>{% endif %}{{ p }}</span>{% endmacro %}
+{% macro empty(icon, title, text) %}<div class="empty"><i class="bi bi-{{ icon }}"></i><div class="t">{{ title }}</div><div>{{ text }}</div></div>{% endmacro %}
+{% macro stat(icon, value, label, tone='') %}<div class="cc-card stat"><div class="ico {{ tone }}"><i class="bi bi-{{ icon }}"></i></div><div><div class="num">{{ value }}</div><div class="lbl">{{ label }}</div></div></div>{% endmacro %}
+{% macro field_error(errors, name) %}{% if errors and errors.get(name) %}<div class="field-error">{{ errors[name] }}</div>{% endif %}{% endmacro %}
+{% macro pager(pagination, endpoint) %}
+{% if pagination.pages > 1 %}
+{% set args = request.args.to_dict() %}
+<nav class="d-flex justify-content-between align-items-center p-3 border-top"><small class="text-muted">Page {{ pagination.page }} of {{ pagination.pages }} · {{ pagination.total }} records</small>
+<ul class="pagination pagination-sm mb-0">
+{% if pagination.has_prev %}{% set _ = args.update({'page': pagination.prev_num}) %}<li class="page-item"><a class="page-link" href="{{ url_for(endpoint, **args) }}">Previous</a></li>{% endif %}
+{% if pagination.has_next %}{% set _ = args.update({'page': pagination.next_num}) %}<li class="page-item"><a class="page-link" href="{{ url_for(endpoint, **args) }}">Next</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endmacro %}

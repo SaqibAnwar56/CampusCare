@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, priority_badge, empty, pager with context %}
+{% block title %}{{ title }}{% endblock %}
+{% block heading %}{{ title }}{% endblock %}
+{% block subheading %}{{ pagination.total }} request{{ '' if pagination.total == 1 else 's' }} match your filters{% endblock %}
+{% block actions %}{% if scope == 'mine' %}<a class="btn btn-primary" href="{{ url_for('main.new_request') }}"><i class="bi bi-plus-lg"></i> New request</a>
+{% else %}<a class="btn btn-outline-primary" href="{{ url_for('admin.reports_csv') }}"><i class="bi bi-download"></i> Export CSV</a>{% endif %}{% endblock %}
+{% block content %}
+{% set ep = 'main.my_requests' if scope == 'mine' else 'admin.requests_list' %}
+<form class="cc-card card-b mb-3" method="get" action="{{ url_for(ep) }}"><div class="row g-2 align-items-end">
+  <div class="col-lg-3"><label class="form-label small">Search</label><input class="form-control" name="q" value="{{ request.args.get('q','') }}" placeholder="Reference, title, location…"></div>
+  <div class="col-6 col-lg-2"><label class="form-label small">Status</label><select class="form-select" name="status"><option value="">All</option>{% for s in STATUSES %}<option {{ 'selected' if request.args.get('status') == s }}>{{ s }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-lg-2"><label class="form-label small">Category</label><select class="form-select" name="category"><option value="">All</option>{% for s in CATEGORIES %}<option {{ 'selected' if request.args.get('category') == s }}>{{ s }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-lg-2"><label class="form-label small">Priority</label><select class="form-select" name="priority"><option value="">All</option>{% for s in PRIORITIES %}<option {{ 'selected' if request.args.get('priority') == s }}>{{ s }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-lg-3"><label class="form-label small">Building</label><select class="form-select" name="building"><option value="">All</option>{% for s in BUILDINGS %}<option {{ 'selected' if request.args.get('building') == s }}>{{ s }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-lg-2"><label class="form-label small">Sort by</label><select class="form-select" name="sort"><option value="newest">Newest</option><option value="priority" {{ 'selected' if request.args.get('sort') == 'priority' }}>Priority</option><option value="due" {{ 'selected' if request.args.get('sort') == 'due' }}>Due date</option></select></div>
+  {% if scope == 'admin' %}<div class="col-6 col-lg-2"><div class="form-check mt-4"><input class="form-check-input" type="checkbox" name="overdue" value="1" id="ov" {{ 'checked' if request.args.get('overdue') == '1' }}><label class="form-check-label" for="ov">Overdue only</label></div></div>{% endif %}
+  <div class="col-12 col-lg-auto ms-lg-auto d-flex gap-2"><button class="btn btn-navy"><i class="bi bi-funnel"></i> Filter</button><a class="btn btn-light" href="{{ url_for(ep) }}">Reset</a></div>
+</div></form>
+<div class="cc-card">
+{% if pagination.items %}<div class="table-responsive"><table class="table cc-table"><thead><tr><th>Reference</th><th>Title</th>{% if scope == 'admin' %}<th>Reporter</th>{% endif %}<th>Location</th><th>Category</th><th>Priority</th><th>Status</th><th>{{ 'Assigned to' }}</th><th>Due</th></tr></thead><tbody>
+{% for r in pagination.items %}<tr><td><a class="ref" href="{{ url_for('main.detail', ref=r.reference_id) }}">{{ r.reference_id }}</a></td>
+<td>{{ r.title }}{% if r.duplicate_of_id %} <i class="bi bi-copy text-warning" title="Possible duplicate of {{ r.duplicate_of.reference_id }}"></i>{% endif %}</td>
+{% if scope == 'admin' %}<td>{{ r.requester.full_name }}</td>{% endif %}
+<td>{{ r.building }}<br><small class="text-muted">{{ r.location }}</small></td><td>{{ r.category }}</td><td>{{ priority_badge(r.priority) }}</td><td>{{ status_badge(r.status) }}</td>
+<td>{{ r.assigned_staff.full_name if r.assigned_staff else '—' }}</td>
+<td class="small {{ 'text-danger fw-semibold' if r.is_overdue }}">{{ r.due_at|localtime('%d %b, %H:%M') }}{% if r.is_overdue %}<br><span class="pill overdue-tag">Overdue</span>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{{ pager(pagination, ep) }}
+{% else %}{{ empty('search', 'No requests found', 'Try clearing some filters or submit a new request.') }}{% endif %}</div>
+{% endblock %}

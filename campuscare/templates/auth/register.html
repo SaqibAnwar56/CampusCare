@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field_error %}
+{% block title %}Create account{% endblock %}
+{% block auth %}
+<div class="auth-wrap">{% include "auth/_hero.html" %}
+  <div class="auth-form"><div class="box">
+    <h3 class="fw-bold mb-1">Create your account</h3><p class="text-muted mb-4">For students and faculty. Staff and administrator accounts are created by an administrator.</p>
+    <form method="post" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3"><label class="form-label" for="full_name">Full name</label><input class="form-control" id="full_name" name="full_name" value="{{ form.full_name }}" required>{{ field_error(errors,'full_name') }}</div>
+      <div class="mb-3"><label class="form-label" for="email">University email</label><input class="form-control" id="email" name="email" type="email" value="{{ form.email }}" required>{{ field_error(errors,'email') }}</div>
+      <div class="mb-3"><label class="form-label" for="department">Department <span class="text-muted fw-normal">(optional)</span></label><input class="form-control" id="department" name="department" value="{{ form.department }}"></div>
+      <div class="row g-3 mb-4"><div class="col-6"><label class="form-label" for="password">Password</label><input class="form-control" id="password" name="password" type="password" required>{{ field_error(errors,'password') }}</div>
+      <div class="col-6"><label class="form-label" for="confirm_password">Confirm</label><input class="form-control" id="confirm_password" name="confirm_password" type="password" required>{{ field_error(errors,'confirm_password') }}</div>
+      <div class="col-12 text-muted small">At least 8 characters with letters and digits.</div></div>
+      <button class="btn btn-primary w-100 py-2">Create account</button>
+    </form>
+    <p class="text-center mt-3">Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+  </div></div>
+</div>
+{% endblock %}

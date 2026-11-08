@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block auth %}
+<div class="auth-wrap">{% include "auth/_hero.html" %}
+  <div class="auth-form"><div class="box">
+    <h3 class="fw-bold mb-1">Welcome back</h3><p class="text-muted mb-4">Sign in to your CampusCare account.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for cat, msg in messages %}<div class="alert alert-{{ cat }}">{{ msg }}</div>{% endfor %}{% endwith %}
+    <form method="post" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control" id="email" name="email" type="email" value="{{ email }}" required autofocus></div>
+      <div class="mb-4"><label class="form-label" for="password">Password</label><input class="form-control" id="password" name="password" type="password" required></div>
+      <button class="btn btn-primary w-100 py-2">Sign in</button>
+    </form>
+    <p class="text-center mt-3 mb-4">New student or faculty member? <a href="{{ url_for('auth.register') }}">Create an account</a></p>
+    <div class="demo"><strong>Demo accounts</strong> (seed data only)<br>Admin: admin@campuscare.test · Staff: electrician@campuscare.test · Student: student1@campuscare.test<br>Password for all demo accounts is listed in README.md.</div>
+  </div></div>
+</div>
+{% endblock %}

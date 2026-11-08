@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, priority_badge, empty, stat with context %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block heading %}Operations Dashboard{% endblock %}
+{% block subheading %}Live overview of campus maintenance{% endblock %}
+{% block actions %}<a class="btn btn-outline-primary" href="{{ url_for('admin.reports') }}"><i class="bi bi-file-earmark-bar-graph"></i> Reports</a>{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-sm-6 col-xl-3">{{ stat('collection', stats.total, 'Total requests') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('hourglass-split', stats.open, 'Open requests', 'warn') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('alarm', stats.overdue, 'Overdue', 'bad') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('check2-circle', stats.resolved, 'Resolved / closed', 'ok') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('person-exclamation', stats.unassigned, 'Awaiting triage / assignment', 'ind') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('stopwatch', (stats.avg_resolution_hours ~ ' h') if stats.avg_resolution_hours is not none else '—', 'Avg. time to resolve') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('star-half', (stats.avg_rating ~ ' / 5') if stats.avg_rating is not none else '—', 'Avg. satisfaction', 'warn') }}</div>
+  <div class="col-sm-6 col-xl-3">{{ stat('graph-up-arrow', stats.trend|sum(attribute='count'), 'Reported in last 7 days') }}</div>
+</div>
+<div class="row g-3 mb-3">
+  <div class="col-lg-4"><div class="cc-card"><div class="card-h"><h2>Requests by status</h2></div><div class="card-b"><div class="chart-box"><canvas id="chartStatus"></canvas></div></div></div></div>
+  <div class="col-lg-4"><div class="cc-card"><div class="card-h"><h2>Open requests by priority</h2></div><div class="card-b"><div class="chart-box"><canvas id="chartPriority"></canvas></div></div></div></div>
+  <div class="col-lg-4"><div class="cc-card"><div class="card-h"><h2>New requests (7 days)</h2></div><div class="card-b"><div class="chart-box"><canvas id="chartTrend"></canvas></div></div></div></div>
+  <div class="col-12"><div class="cc-card"><div class="card-h"><h2>Requests by category</h2></div><div class="card-b"><div class="chart-box" style="height:230px"><canvas id="chartCategory"></canvas></div></div></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-xl-7"><div class="cc-card"><div class="card-h"><h2><i class="bi bi-inbox text-primary"></i> Needs triage or assignment</h2><a href="{{ url_for('admin.requests_list', sort='priority') }}">All requests</a></div>
+  {% if attention %}<div class="table-responsive"><table class="table cc-table"><thead><tr><th>Reference</th><th>Title</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody>{% for r in attention %}
+  <tr><td class="ref">{{ r.reference_id }}</td><td>{{ r.title }}<br><small class="text-muted">{{ r.building }} · {{ r.location }}</small></td><td>{{ priority_badge(r.priority) }}</td><td>{{ status_badge(r.status) }}</td><td class="text-end"><a class="btn btn-sm btn-primary" href="{{ url_for('main.detail', ref=r.reference_id) }}">Open</a></td></tr>{% endfor %}</tbody></table></div>
+  {% else %}{{ empty('check-all', 'Queue is clear', 'Every request has been triaged and assigned.') }}{% endif %}</div></div>
+  <div class="col-xl-5"><div class="cc-card"><div class="card-h"><h2><i class="bi bi-alarm text-danger"></i> Overdue requests</h2><a href="{{ url_for('admin.requests_list', overdue=1) }}">View all</a></div>
+  {% if overdue %}<ul class="list-group list-group-flush">{% for r in overdue %}<li class="list-group-item d-flex justify-content-between align-items-center"><div><a class="ref" href="{{ url_for('main.detail', ref=r.reference_id) }}">{{ r.reference_id }}</a> {{ r.title|truncate(34) }}<br><small class="text-muted">Due {{ r.due_at|localtime('%d %b, %H:%M') }} · {{ r.assigned_staff.full_name if r.assigned_staff else 'Unassigned' }}</small></div>{{ priority_badge(r.priority) }}</li>{% endfor %}</ul>
+  {% else %}{{ empty('emoji-sunglasses', 'Nothing overdue', 'All open requests are within their target time.') }}{% endif %}</div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.js') }}"></script><script src="{{ url_for('static', filename='js/charts.js') }}"></script>{% endblock %}

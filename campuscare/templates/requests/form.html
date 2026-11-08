@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field_error with context %}
+{% block title %}New request{% endblock %}
+{% block heading %}Report a problem{% endblock %}
+{% block subheading %}Give staff enough detail to fix it on the first visit{% endblock %}
+{% block content %}
+<div class="row"><div class="col-xl-9">
+{% if duplicates %}
+<div class="dup-box mb-3"><strong><i class="bi bi-exclamation-triangle"></i> Possible duplicate</strong>
+<p class="mb-2">An open request already exists for this category and location. Please check whether it is the same problem:</p>
+<ul>{% for d in duplicates %}<li><a href="{{ url_for('main.detail', ref=d.reference_id) }}" target="_blank">{{ d.reference_id }}</a> — {{ d.title }} ({{ d.status }})</li>{% endfor %}</ul>
+<p class="mb-0 small">If yours is a different problem, tick <em>“This is a different problem”</em> below and submit again. Re-attach your image if you added one.</p></div>
+{% endif %}
+<div class="cc-card"><div class="card-b">
+<form method="post" enctype="multipart/form-data" id="requestForm" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="row g-3">
+    <div class="col-12"><label class="form-label" for="title">Title</label><input class="form-control" id="title" name="title" maxlength="120" value="{{ form.get('title','') }}" placeholder="e.g. Projector not turning on in Lab 3" required>{{ field_error(errors,'title') }}</div>
+    <div class="col-md-6"><label class="form-label" for="category">Category</label><select class="form-select" id="category" name="category" required><option value="">Select category…</option>{% for c in CATEGORIES %}<option {{ 'selected' if form.get('category') == c }}>{{ c }}</option>{% endfor %}</select>{{ field_error(errors,'category') }}</div>
+    <div class="col-md-6"><label class="form-label" for="priority">Priority</label><select class="form-select" id="priority" name="priority" required><option value="">Select priority…</option>{% for p in PRIORITIES %}<option {{ 'selected' if form.get('priority') == p }}>{{ p }}</option>{% endfor %}</select>
+      <div class="form-text">Safety hazards are escalated automatically; administrators may adjust priority.</div>{{ field_error(errors,'priority') }}</div>
+    <div class="col-md-6"><label class="form-label" for="building">Building</label><select class="form-select" id="building" name="building" required><option value="">Select building…</option>{% for b in BUILDINGS %}<option {{ 'selected' if form.get('building') == b }}>{{ b }}</option>{% endfor %}</select>{{ field_error(errors,'building') }}</div>
+    <div class="col-md-6"><label class="form-label" for="location">Room / location</label><input class="form-control" id="location" name="location" maxlength="100" value="{{ form.get('location','') }}" placeholder="e.g. Room 204, 2nd floor" required>{{ field_error(errors,'location') }}</div>
+    <div class="col-12"><div id="liveDup" class="dup-box d-none"></div></div>
+    <div class="col-12"><label class="form-label d-flex justify-content-between" for="description"><span>Description</span><small class="text-muted fw-normal" id="descCount"></small></label>
+      <textarea class="form-control" id="description" name="description" rows="5" maxlength="2000" data-counter="#descCount" placeholder="What is wrong, since when, and is anyone at risk?" required>{{ form.get('description','') }}</textarea>{{ field_error(errors,'description') }}</div>
+    <div class="col-md-8"><label class="form-label" for="image">Supporting photo <span class="text-muted fw-normal">(optional · PNG/JPG · max 2 MB)</span></label><input class="form-control" type="file" id="image" name="image" accept=".png,.jpg,.jpeg,image/png,image/jpeg">
+      <div class="field-error" id="imageClientError"></div>{{ field_error(errors,'image') }}</div>
+    <div class="col-md-4"><img id="imagePreview" class="img-fluid rounded d-none border" alt="Preview"></div>
+    {% if duplicates %}<div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" name="confirm_duplicate" value="1" id="cd"><label class="form-check-label" for="cd">This is a different problem — submit anyway</label></div></div>{% endif %}
+  </div>
+  <div class="d-flex gap-2 mt-4"><button class="btn btn-primary px-4"><i class="bi bi-send"></i> Submit request</button><a class="btn btn-light" href="{{ url_for('main.dashboard') }}">Cancel</a></div>
+</form></div></div></div></div>
+{% endblock %}

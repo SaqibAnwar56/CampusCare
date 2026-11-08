@@ -1,0 +1,301 @@
+{
+  "exit_status": 0,
+  "tests": [
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc01_valid_login_redirects_to_role_dashboard",
+      "tc": "TC-01",
+      "observed": "HTTP 302, redirected to /",
+      "outcome": "passed",
+      "duration": 0.167,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc02_invalid_password_rejected_with_generic_message",
+      "tc": "TC-02",
+      "observed": "HTTP 401; generic error shown; no session created",
+      "outcome": "passed",
+      "duration": 0.14,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc03_account_locks_after_repeated_failures",
+      "tc": "TC-03",
+      "observed": "After 5 failures correct password gives HTTP 401; locked_until set=True",
+      "outcome": "passed",
+      "duration": 0.566,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc04_self_registration_cannot_create_privileged_role",
+      "tc": "TC-04",
+      "observed": "Account created with role='requester' although role=admin was posted",
+      "outcome": "passed",
+      "duration": 0.105,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc05_weak_password_rejected_on_registration",
+      "tc": "TC-05",
+      "observed": "HTTP 422; user created=False",
+      "outcome": "passed",
+      "duration": 0.024,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc06_anonymous_user_redirected_to_login",
+      "tc": "TC-06",
+      "observed": "HTTP 302 \u2192 /login?next=%2Fdashboard",
+      "outcome": "passed",
+      "duration": 0.001,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc07_student_cannot_open_admin_pages",
+      "tc": "TC-07",
+      "observed": "HTTP codes for 4 admin URLs: [403, 403, 403, 403]",
+      "outcome": "passed",
+      "duration": 0.126,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc08_staff_cannot_manage_users_or_assign",
+      "tc": "TC-08",
+      "observed": "/admin/users \u2192 403; POST assign \u2192 403",
+      "outcome": "passed",
+      "duration": 0.175,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc09_student_cannot_view_another_students_request",
+      "tc": "TC-09",
+      "observed": "HTTP 403 for another user's request",
+      "outcome": "passed",
+      "duration": 0.132,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc10_csrf_token_required_when_enabled",
+      "tc": "TC-10",
+      "observed": "POST without CSRF token \u2192 HTTP 400",
+      "outcome": "passed",
+      "duration": 0.021,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc11_valid_request_created_with_reference_and_history",
+      "tc": "TC-11",
+      "observed": "HTTP 302; ref=CC-2026-0001; status=Submitted; history rows=1",
+      "outcome": "passed",
+      "duration": 0.115,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc12_missing_required_fields_rejected",
+      "tc": "TC-12",
+      "observed": "HTTP 422; rows created=0",
+      "outcome": "passed",
+      "duration": 0.128,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc13_safety_keyword_escalates_to_critical",
+      "tc": "TC-13",
+      "observed": "Requested=Low, effective=Critical, due in 8 h",
+      "outcome": "passed",
+      "duration": 0.007,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc14_safety_category_minimum_priority_high_but_extinguisher_not_critical",
+      "tc": "TC-14",
+      "observed": "Requested=Low, effective=High",
+      "outcome": "passed",
+      "duration": 0.01,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc15_duplicate_detected_and_blocked_until_confirmed",
+      "tc": "TC-15",
+      "observed": "Duplicate warning listed CC-2026-0001; confirmed copy flagged duplicate_of=CC-2026-0001",
+      "outcome": "passed",
+      "duration": 0.011,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc16_non_duplicate_in_other_location_accepted",
+      "tc": "TC-16",
+      "observed": "Different room accepted: CC-2026-0002, duplicate_of=None",
+      "outcome": "passed",
+      "duration": 0.014,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc17_valid_png_upload_stored_and_access_controlled",
+      "tc": "TC-17",
+      "observed": "Stored as random name 642bb594562d4f4aaa78fa8a50241a2c.png; owner \u2192 200; other student \u2192 403",
+      "outcome": "passed",
+      "duration": 0.344,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc18_invalid_uploads_rejected[evil.exe-MZ00000000000000000000000000000000000000000000000000]",
+      "tc": "TC-18",
+      "observed": "evil.exe: HTTP 422; requests created=0",
+      "outcome": "passed",
+      "duration": 0.132,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc18_invalid_uploads_rejected[note.png-this is not an image]",
+      "tc": "TC-18",
+      "observed": "note.png: HTTP 422; requests created=0",
+      "outcome": "passed",
+      "duration": 0.136,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc18_invalid_uploads_rejected[a.jpg-\\x89PNG\\r\\n\\x1a\\n\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00]",
+      "tc": "TC-18",
+      "observed": "a.jpg: HTTP 422; requests created=0",
+      "outcome": "passed",
+      "duration": 0.131,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc19_oversized_image_rejected",
+      "tc": "TC-19",
+      "observed": "2 MB+ image: HTTP 422",
+      "outcome": "passed",
+      "duration": 0.135,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc20_admin_review_then_assign_records_assignment_and_audit",
+      "tc": "TC-20",
+      "observed": "HTTP 302; status=Assigned; assigned_to=Test Electrician; history=3; audit ASSIGN=1",
+      "outcome": "passed",
+      "duration": 0.126,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc21_invalid_transition_rejected_at_service_and_http_level",
+      "tc": "TC-21",
+      "observed": "Submitted\u2192Closed, Submitted\u2192Assigned, Submitted\u2192Resolved all refused; status still Submitted; message shown=True",
+      "outcome": "passed",
+      "duration": 0.173,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc22_assignment_requires_review_and_valid_staff",
+      "tc": "TC-22",
+      "observed": "Assign refused while Submitted; refused for a student account; status unchanged",
+      "outcome": "passed",
+      "duration": 0.018,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc23_staff_cannot_resolve_task_assigned_to_someone_else",
+      "tc": "TC-23",
+      "observed": "Unassigned staff blocked from Start and Resolve with PermissionDenied",
+      "outcome": "passed",
+      "duration": 0.019,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc24_resolution_requires_notes",
+      "tc": "TC-24",
+      "observed": "Note 'ok' refused; full note accepted; status=Resolved; resolved_at set=True",
+      "outcome": "passed",
+      "duration": 0.018,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc25_full_lifecycle_through_web_interface",
+      "tc": "TC-25",
+      "observed": "Final status Closed; path: Submitted \u2192 Under Review \u2192 Assigned \u2192 In Progress \u2192 Resolved \u2192 Closed",
+      "outcome": "passed",
+      "duration": 0.327,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc26_reject_requires_reason_and_is_terminal",
+      "tc": "TC-26",
+      "observed": "Reject without reason refused; with reason accepted; no transitions out of Rejected",
+      "outcome": "passed",
+      "duration": 0.012,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc27_reopen_resolved_request_needs_explanation",
+      "tc": "TC-27",
+      "observed": "Re-open accepted with reason; status=In Progress; resolved_at cleared=True",
+      "outcome": "passed",
+      "duration": 0.021,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc28_feedback_only_after_resolution_once_and_valid_rating",
+      "tc": "TC-28",
+      "observed": "Early, out-of-range, foreign and duplicate feedback refused; stored rating=4",
+      "outcome": "passed",
+      "duration": 0.021,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc29_filters_return_expected_subset",
+      "tc": "TC-29",
+      "observed": "category=Electrical\u21922; priority=Low\u21922; both\u21921; search 'Fan'\u21921",
+      "outcome": "passed",
+      "duration": 0.166,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc30_overdue_detection_and_priority_sorting",
+      "tc": "TC-30",
+      "observed": "Priority order: ['Critical', 'Low']; overdue list: ['CC-2026-0001']",
+      "outcome": "passed",
+      "duration": 0.015,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc31_admin_priority_change_requires_reason_and_resets_due_date",
+      "tc": "TC-31",
+      "observed": "Priority Low\u2192High; due moved from +168h to +24h",
+      "outcome": "passed",
+      "duration": 0.012,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc32_report_summary_and_csv_export",
+      "tc": "TC-32",
+      "observed": "Report: total=2, resolved=1; CSV HTTP 200, 2 data rows, type=text/csv",
+      "outcome": "passed",
+      "duration": 0.125,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc33_suggest_staff_prefers_specialty_then_lowest_workload",
+      "tc": "TC-33",
+      "observed": "Ranking for Electrical: [('Test Electrician', True, 0), ('Test Plumber', False, 0)]",
+      "outcome": "passed",
+      "duration": 0.011,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc34_deactivated_user_cannot_login",
+      "tc": "TC-34",
+      "observed": "Deactivated account login \u2192 HTTP 401",
+      "outcome": "passed",
+      "duration": 0.035,
+      "longrepr": ""
+    },
+    {
+      "nodeid": "tests/test_campuscare.py::test_tc35_admin_cannot_demote_or_deactivate_self",
+      "tc": "TC-35",
+      "observed": "Own role after attempt: admin; active=True",
+      "outcome": "passed",
+      "duration": 0.099,
+      "longrepr": ""
+    }
+  ]
+}

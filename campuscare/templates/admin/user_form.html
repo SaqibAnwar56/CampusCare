@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field_error with context %}
+{% block title %}Add user{% endblock %}
+{% block heading %}Add user{% endblock %}
+{% block subheading %}Create staff, administrator or reporter accounts{% endblock %}
+{% block content %}
+<div class="cc-card" style="max-width:720px"><div class="card-b"><form method="post" novalidate><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="row g-3">
+<div class="col-md-6"><label class="form-label">Full name</label><input class="form-control" name="full_name" value="{{ form.get('full_name','') }}">{{ field_error(errors,'full_name') }}</div>
+<div class="col-md-6"><label class="form-label">Email</label><input class="form-control" type="email" name="email" value="{{ form.get('email','') }}">{{ field_error(errors,'email') }}</div>
+<div class="col-md-6"><label class="form-label">Role</label><select class="form-select" name="role">{% for k,v in ROLE_LABELS.items() %}<option value="{{ k }}" {{ 'selected' if form.get('role') == k }}>{{ v }}</option>{% endfor %}</select>{{ field_error(errors,'role') }}</div>
+<div class="col-md-6"><label class="form-label">Staff specialty <span class="text-muted fw-normal">(staff only)</span></label><select class="form-select" name="specialty"><option value="">General</option>{% for c in CATEGORIES %}<option {{ 'selected' if form.get('specialty') == c }}>{{ c }}</option>{% endfor %}</select></div>
+<div class="col-md-6"><label class="form-label">Department</label><input class="form-control" name="department" value="{{ form.get('department','') }}"></div>
+<div class="col-md-6"><label class="form-label">Temporary password</label><input class="form-control" type="password" name="password">{{ field_error(errors,'password') }}</div></div>
+<div class="d-flex gap-2 mt-4"><button class="btn btn-primary">Create user</button><a class="btn btn-light" href="{{ url_for('admin.users') }}">Cancel</a></div></form></div></div>
+{% endblock %}

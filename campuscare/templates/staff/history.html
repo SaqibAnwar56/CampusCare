@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, priority_badge, empty, pager with context %}
+{% block title %}Task History{% endblock %}
+{% block heading %}Task History{% endblock %}
+{% block subheading %}Tasks you have completed{% endblock %}
+{% block content %}
+<div class="cc-card">{% if pagination.items %}<div class="table-responsive"><table class="table cc-table"><thead><tr><th>Reference</th><th>Task</th><th>Priority</th><th>Status</th><th>Resolved</th><th>Hours taken</th><th>Resolution notes</th><th>Rating</th></tr></thead><tbody>
+{% for r in pagination.items %}<tr><td><a class="ref" href="{{ url_for('main.detail', ref=r.reference_id) }}">{{ r.reference_id }}</a></td><td>{{ r.title }}</td><td>{{ priority_badge(r.priority) }}</td><td>{{ status_badge(r.status) }}</td>
+<td class="small">{{ r.resolved_at|localtime }}</td><td>{{ r.hours_to_resolve }}</td><td class="small text-muted" style="max-width:280px">{{ r.resolution_notes|truncate(90) }}</td>
+<td class="stars">{% if r.feedback %}{{ '★' * r.feedback.rating }}{% else %}<span class="text-muted">—</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{{ pager(pagination, 'staff.history') }}
+{% else %}{{ empty('clock-history', 'No completed tasks yet', 'Tasks you resolve will be listed here with your resolution notes.') }}{% endif %}</div>
+{% endblock %}

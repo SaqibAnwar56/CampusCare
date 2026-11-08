@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, priority_badge, empty, stat with context %}
+{% block title %}Reports{% endblock %}
+{% block heading %}Maintenance Reports{% endblock %}
+{% block subheading %}Service performance for the selected period{% endblock %}
+{% block actions %}<a class="btn btn-outline-primary" href="{{ url_for('admin.reports_csv', **{'from': d_from, 'to': d_to}) }}"><i class="bi bi-download"></i> Export CSV</a> <button class="btn btn-light no-print" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>{% endblock %}
+{% block content %}
+<form class="cc-card card-b mb-3 no-print" method="get"><div class="row g-2 align-items-end"><div class="col-md-3"><label class="form-label small">From</label><input type="date" class="form-control" name="from" value="{{ d_from }}"></div>
+<div class="col-md-3"><label class="form-label small">To</label><input type="date" class="form-control" name="to" value="{{ d_to }}"></div><div class="col-auto"><button class="btn btn-navy">Apply</button> <a class="btn btn-light" href="{{ url_for('admin.reports') }}">Reset</a></div></div></form>
+<div class="row g-3 mb-3">
+<div class="col-sm-6 col-xl-3">{{ stat('collection', s.total, 'Requests in period') }}</div>
+<div class="col-sm-6 col-xl-3">{{ stat('check2-circle', s.resolved, 'Resolved', 'ok') }}</div>
+<div class="col-sm-6 col-xl-3">{{ stat('speedometer', (s.sla_compliance ~ '%') if s.sla_compliance is not none else '—', 'Resolved within target time', 'ind') }}</div>
+<div class="col-sm-6 col-xl-3">{{ stat('alarm', s.overdue_open, 'Open &amp; overdue'|safe, 'bad') }}</div></div>
+<div class="cc-card mb-3"><div class="card-h"><h2>Performance by category</h2></div>
+{% if s.by_category %}<div class="table-responsive"><table class="table cc-table"><thead><tr><th>Category</th><th>Total</th><th>Open</th><th>Resolved</th><th>Rejected</th><th>Avg. hours to resolve</th><th>Avg. rating</th></tr></thead><tbody>
+{% for cat, d in s.by_category.items() %}<tr><td class="fw-semibold">{{ cat }}</td><td>{{ d.total }}</td><td>{{ d.open }}</td><td>{{ d.resolved }}</td><td>{{ d.rejected }}</td><td>{{ d.avg_hours if d.avg_hours is not none else '—' }}</td><td>{{ d.avg_rating if d.avg_rating is not none else '—' }}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}{{ empty('bar-chart', 'No data for this period', 'Choose a wider date range.') }}{% endif %}</div>
+<div class="row g-3"><div class="col-md-6"><div class="cc-card"><div class="card-h"><h2>By priority</h2></div><div class="card-b">{% for p, n in s.by_priority.items() %}<div class="d-flex justify-content-between mb-2">{{ priority_badge(p) }}<strong>{{ n }}</strong></div>{% endfor %}</div></div></div>
+<div class="col-md-6"><div class="cc-card"><div class="card-h"><h2>By status</h2></div><div class="card-b">{% for p, n in s.by_status.items() %}<div class="d-flex justify-content-between mb-2">{{ status_badge(p) }}<strong>{{ n }}</strong></div>{% endfor %}</div></div></div></div>
+{% endblock %}

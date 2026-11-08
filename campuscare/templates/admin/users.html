@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "_macros.html" import empty with context %}
+{% block title %}Users{% endblock %}
+{% block heading %}User Management{% endblock %}
+{% block subheading %}{{ users|length }} account{{ '' if users|length == 1 else 's' }}{% endblock %}
+{% block actions %}<a class="btn btn-primary" href="{{ url_for('admin.new_user') }}"><i class="bi bi-person-plus"></i> Add user</a>{% endblock %}
+{% block content %}
+<form class="cc-card card-b mb-3" method="get"><div class="row g-2"><div class="col-md-6"><input class="form-control" name="q" value="{{ request.args.get('q','') }}" placeholder="Search name or email"></div>
+<div class="col-md-3"><select class="form-select" name="role"><option value="">All roles</option>{% for k,v in ROLE_LABELS.items() %}<option value="{{ k }}" {{ 'selected' if request.args.get('role') == k }}>{{ v }}</option>{% endfor %}</select></div>
+<div class="col-md-3 d-flex gap-2"><button class="btn btn-navy">Filter</button><a class="btn btn-light" href="{{ url_for('admin.users') }}">Reset</a></div></div></form>
+<div class="cc-card">{% if users %}<div class="table-responsive"><table class="table cc-table"><thead><tr><th>Name</th><th>Email</th><th>Department / specialty</th><th>Role</th><th>Status</th><th class="text-end">Actions</th></tr></thead><tbody>
+{% for u in users %}<tr><td class="fw-semibold">{{ u.full_name }}</td><td>{{ u.email }}</td><td>{{ u.department or '—' }}{% if u.specialty %}<br><small class="text-muted">{{ u.specialty }}</small>{% endif %}</td>
+<td><form method="post" action="{{ url_for('admin.update_user', user_id=u.id) }}" class="d-flex gap-1"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<select class="form-select form-select-sm" name="role" {{ 'disabled' if u.id == current_user.id }}>{% for k,v in ROLE_LABELS.items() %}<option value="{{ k }}" {{ 'selected' if u.role == k }}>{{ v }}</option>{% endfor %}</select>
+{% if u.id != current_user.id %}<button class="btn btn-sm btn-outline-primary">Save</button>{% endif %}</form></td>
+<td>{% if u.is_active_account %}<span class="pill st-resolved">Active</span>{% else %}<span class="pill st-rejected">Deactivated</span>{% endif %}</td>
+<td class="text-end">{% if u.id != current_user.id %}<form method="post" action="{{ url_for('admin.update_user', user_id=u.id) }}" data-confirm="{{ 'Deactivate' if u.is_active_account else 'Reactivate' }} {{ u.full_name }}?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="toggle_active" value="1"><button class="btn btn-sm btn-outline-{{ 'danger' if u.is_active_account else 'success' }}">{{ 'Deactivate' if u.is_active_account else 'Reactivate' }}</button></form>{% else %}<span class="text-muted small">You</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}{{ empty('people', 'No users match', 'Adjust the search or role filter.') }}{% endif %}</div>
+{% endblock %}

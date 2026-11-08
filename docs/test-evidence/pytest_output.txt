@@ -1,0 +1,46 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.2.0, pluggy-1.7.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/claude/CampusCare
+plugins: platformdirs-4.13.0
+collecting ... collected 37 items
+
+tests/test_campuscare.py::test_tc01_valid_login_redirects_to_role_dashboard PASSED [  2%]
+tests/test_campuscare.py::test_tc02_invalid_password_rejected_with_generic_message PASSED [  5%]
+tests/test_campuscare.py::test_tc03_account_locks_after_repeated_failures PASSED [  8%]
+tests/test_campuscare.py::test_tc04_self_registration_cannot_create_privileged_role PASSED [ 10%]
+tests/test_campuscare.py::test_tc05_weak_password_rejected_on_registration PASSED [ 13%]
+tests/test_campuscare.py::test_tc06_anonymous_user_redirected_to_login PASSED [ 16%]
+tests/test_campuscare.py::test_tc07_student_cannot_open_admin_pages PASSED [ 18%]
+tests/test_campuscare.py::test_tc08_staff_cannot_manage_users_or_assign PASSED [ 21%]
+tests/test_campuscare.py::test_tc09_student_cannot_view_another_students_request PASSED [ 24%]
+tests/test_campuscare.py::test_tc10_csrf_token_required_when_enabled PASSED [ 27%]
+tests/test_campuscare.py::test_tc11_valid_request_created_with_reference_and_history PASSED [ 29%]
+tests/test_campuscare.py::test_tc12_missing_required_fields_rejected PASSED [ 32%]
+tests/test_campuscare.py::test_tc13_safety_keyword_escalates_to_critical PASSED [ 35%]
+tests/test_campuscare.py::test_tc14_safety_category_minimum_priority_high_but_extinguisher_not_critical PASSED [ 37%]
+tests/test_campuscare.py::test_tc15_duplicate_detected_and_blocked_until_confirmed PASSED [ 40%]
+tests/test_campuscare.py::test_tc16_non_duplicate_in_other_location_accepted PASSED [ 43%]
+tests/test_campuscare.py::test_tc17_valid_png_upload_stored_and_access_controlled PASSED [ 45%]
+tests/test_campuscare.py::test_tc18_invalid_uploads_rejected[evil.exe-MZ00000000000000000000000000000000000000000000000000] PASSED [ 48%]
+tests/test_campuscare.py::test_tc18_invalid_uploads_rejected[note.png-this is not an image] PASSED [ 51%]
+tests/test_campuscare.py::test_tc18_invalid_uploads_rejected[a.jpg-\x89PNG\r\n\x1a\n\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00] PASSED [ 54%]
+tests/test_campuscare.py::test_tc19_oversized_image_rejected PASSED      [ 56%]
+tests/test_campuscare.py::test_tc20_admin_review_then_assign_records_assignment_and_audit PASSED [ 59%]
+tests/test_campuscare.py::test_tc21_invalid_transition_rejected_at_service_and_http_level PASSED [ 62%]
+tests/test_campuscare.py::test_tc22_assignment_requires_review_and_valid_staff PASSED [ 64%]
+tests/test_campuscare.py::test_tc23_staff_cannot_resolve_task_assigned_to_someone_else PASSED [ 67%]
+tests/test_campuscare.py::test_tc24_resolution_requires_notes PASSED     [ 70%]
+tests/test_campuscare.py::test_tc25_full_lifecycle_through_web_interface PASSED [ 72%]
+tests/test_campuscare.py::test_tc26_reject_requires_reason_and_is_terminal PASSED [ 75%]
+tests/test_campuscare.py::test_tc27_reopen_resolved_request_needs_explanation PASSED [ 78%]
+tests/test_campuscare.py::test_tc28_feedback_only_after_resolution_once_and_valid_rating PASSED [ 81%]
+tests/test_campuscare.py::test_tc29_filters_return_expected_subset PASSED [ 83%]
+tests/test_campuscare.py::test_tc30_overdue_detection_and_priority_sorting PASSED [ 86%]
+tests/test_campuscare.py::test_tc31_admin_priority_change_requires_reason_and_resets_due_date PASSED [ 89%]
+tests/test_campuscare.py::test_tc32_report_summary_and_csv_export PASSED [ 91%]
+tests/test_campuscare.py::test_tc33_suggest_staff_prefers_specialty_then_lowest_workload PASSED [ 94%]
+tests/test_campuscare.py::test_tc34_deactivated_user_cannot_login PASSED [ 97%]
+tests/test_campuscare.py::test_tc35_admin_cannot_demote_or_deactivate_self PASSED [100%]
+
+============================= 37 passed in 22.77s ==============================

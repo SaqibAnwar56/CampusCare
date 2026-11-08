@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, priority_badge with context %}
+{% block title %}{{ req.reference_id }}{% endblock %}
+{% block heading %}<span class="ref fs-6 text-muted">{{ req.reference_id }}</span> &nbsp;{{ req.title }}{% endblock %}
+{% block subheading %}Reported {{ req.created_at|localtime }} by {{ req.requester.full_name if current_user.role != 'staff' else req.requester.first_name }}{% endblock %}
+{% block actions %}{{ status_badge(req.status) }} {{ priority_badge(req.priority) }}{% if req.is_overdue %} <span class="pill overdue-tag">Overdue</span>{% endif %}{% endblock %}
+{% block content %}
+{% set steps = ['Submitted','Under Review','Assigned','In Progress','Resolved','Closed'] %}
+<div class="cc-card mb-3"><div class="card-b">
+  {% if req.status == 'Rejected' %}<div class="alert alert-danger mb-0"><i class="bi bi-x-octagon"></i> This request was rejected. See the history below for the reason.</div>
+  {% else %}{% set idx = steps.index(req.status) %}<ol class="stepper">{% for s in steps %}<li class="{{ 'done' if loop.index0 < idx else ('current done' if loop.index0 == idx else '') }}">{{ s }}</li>{% endfor %}</ol>{% endif %}
+</div></div>
+<div class="row g-3">
+<div class="col-lg-8">
+  <div class="cc-card mb-3"><div class="card-h"><h2>Details</h2></div><div class="card-b">
+    <p style="white-space:pre-wrap">{{ req.description }}</p>
+    <dl class="kv row mb-0">
+      <div class="col-sm-4"><dt>Category</dt><dd>{{ req.category }}</dd></div>
+      <div class="col-sm-4"><dt>Building</dt><dd>{{ req.building }}</dd></div>
+      <div class="col-sm-4"><dt>Location</dt><dd>{{ req.location }}</dd></div>
+      <div class="col-sm-4"><dt>Assigned to</dt><dd>{{ req.assigned_staff.full_name if req.assigned_staff else 'Not yet assigned' }}</dd></div>
+      <div class="col-sm-4"><dt>Target resolution</dt><dd class="{{ 'text-danger fw-semibold' if req.is_overdue }}">{{ req.due_at|localtime }}</dd></div>
+      <div class="col-sm-4"><dt>Reporter priority</dt><dd>{{ req.requested_priority }}{% if req.priority_escalated %} → <strong>{{ req.priority }}</strong>{% endif %}</dd></div>
+      {% if current_user.role == 'admin' %}<div class="col-sm-4"><dt>Reporter contact</dt><dd>{{ req.requester.email }}</dd></div>{% endif %}
+    </dl>
+    {% if req.duplicate_of %}<div class="alert alert-warning py-2 mt-2 mb-0"><i class="bi bi-copy"></i> Reporter acknowledged a similar open request: <a href="{{ url_for('main.detail', ref=req.duplicate_of.reference_id) }}">{{ req.duplicate_of.reference_id }}</a></div>{% endif %}
+    {% if req.image_filename %}<hr><dt class="text-muted small text-uppercase fw-semibold mb-2">Supporting photo</dt><img src="{{ url_for('main.uploaded_file', filename=req.image_filename) }}" class="img-fluid rounded border" style="max-height:320px" alt="Photo submitted with the request">{% endif %}
+    {% if req.resolution_notes %}<hr><dt class="text-muted small text-uppercase fw-semibold mb-1">Resolution notes</dt><p class="mb-0" style="white-space:pre-wrap">{{ req.resolution_notes }}</p>{% endif %}
+  </div></div>
+
+  {% if req.feedback %}<div class="cc-card mb-3"><div class="card-h"><h2>Feedback</h2></div><div class="card-b"><div class="stars fs-5">{{ '★' * req.feedback.rating }}{{ '☆' * (5 - req.feedback.rating) }}</div><p class="mb-0 mt-1">{{ req.feedback.comment or 'No comment provided.' }}</p></div></div>{% endif %}
+  {% if can_feedback %}<div class="cc-card mb-3"><div class="card-h"><h2>How did we do?</h2></div><div class="card-b">
+    <form method="post" action="{{ url_for('main.feedback', ref=req.reference_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="rating-input mb-2">{% for n in [5,4,3,2,1] %}<input type="radio" name="rating" id="r{{ n }}" value="{{ n }}"><label for="r{{ n }}" title="{{ n }} star{{ 's' if n > 1 }}">★</label>{% endfor %}</div>
+    <textarea class="form-control mb-2" name="comment" rows="2" maxlength="500" placeholder="Optional comment about the repair"></textarea><button class="btn btn-primary btn-sm">Submit feedback</button></form></div></div>{% endif %}
+
+  <div class="cc-card"><div class="card-h"><h2>Request &amp; assignment history</h2></div><div class="card-b"><ul class="history">
+  {% for u in req.updates %}<li class="{{ 'prio' if u.event_type == 'priority' else ('asg' if u.event_type == 'assignment' else '') }}">
+    <div><strong>{% if u.event_type == 'status' %}{% if u.from_status %}{{ u.from_status }} → {% endif %}{{ u.to_status }}{% elif u.event_type == 'assignment' %}Assignment{% else %}Priority{% endif %}</strong>
+    <span class="when">· {{ u.created_at|localtime }} · {{ u.author.first_name if current_user.role == 'staff' and u.author.role == 'requester' else u.author.full_name }}</span></div>
+    {% if u.note %}<div class="text-muted">{{ u.note }}</div>{% endif %}</li>{% endfor %}</ul></div></div>
+</div>
+
+<div class="col-lg-4">
+{% if actions or current_user.role == 'admin' %}
+<div class="cc-card mb-3"><div class="card-h"><h2>Actions</h2></div><div class="card-b">
+  {% for to in actions %}
+  <form method="post" action="{{ url_for('main.do_transition', ref=req.reference_id) }}" class="mb-3"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="to_status" value="{{ to }}">
+    {% if to in ('Rejected','Resolved') or (req.status == 'Resolved' and to == 'In Progress') or (to == 'Under Review' and req.status != 'Submitted') %}
+    <label class="form-label small">{{ 'Reason' if to in ('Rejected','Under Review') or to == 'In Progress' and req.status == 'Resolved' else 'Resolution notes' }}</label><textarea class="form-control mb-2" name="note" rows="2" maxlength="1000" {{ 'required' if to != 'Under Review' }}></textarea>{% endif %}
+    <button class="btn {{ 'btn-danger' if to == 'Rejected' else ('btn-success' if to in ('Resolved','Closed') else 'btn-outline-primary') }} w-100">
+      {% if to == 'Under Review' and req.status == 'Submitted' %}Start review{% elif to == 'Under Review' %}Pull back for re-assignment{% elif to == 'In Progress' and req.status == 'Resolved' %}Re-open: not fixed{% elif to == 'In Progress' %}Start work{% elif to == 'Resolved' %}Mark as resolved{% elif to == 'Closed' %}Confirm &amp; close{% elif to == 'Rejected' %}Reject request{% else %}{{ to }}{% endif %}</button></form>
+  {% endfor %}
+  {% if current_user.role == 'admin' and req.status in ('Under Review','Assigned') %}
+  <hr><form method="post" action="{{ url_for('admin.assign_request', ref=req.reference_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="form-label small">{{ 'Reassign to' if req.status == 'Assigned' else 'Assign to' }}</label>
+    <select class="form-select mb-2" name="staff_id" required><option value="">Select staff member…</option>
+    {% for o in staff_options %}<option value="{{ o.user.id }}">{{ o.user.full_name }} — {{ o.open_tasks }} open task{{ '' if o.open_tasks == 1 else 's' }}{{ ' · ' + o.user.specialty + ' ✓' if o.match }}</option>{% endfor %}</select>
+    <input class="form-control mb-2" name="note" maxlength="255" placeholder="Instructions for staff (optional)"><button class="btn btn-primary w-100"><i class="bi bi-person-check"></i> Assign</button></form>
+  {% endif %}
+  {% if current_user.role == 'admin' and req.is_open %}
+  <hr><form method="post" action="{{ url_for('admin.priority', ref=req.reference_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="form-label small">Change priority</label><select class="form-select mb-2" name="priority">{% for p in PRIORITIES %}<option {{ 'selected' if p == req.priority }}>{{ p }}</option>{% endfor %}</select>
+    <input class="form-control mb-2" name="reason" maxlength="200" placeholder="Reason (required)" required><button class="btn btn-outline-secondary w-100">Update priority</button></form>
+  {% endif %}
+  {% if not actions and not (current_user.role == 'admin' and req.is_open) %}<div class="text-muted small">No actions available at this stage.</div>{% endif %}
+</div></div>
+{% endif %}
+</div></div>
+{% endblock %}
