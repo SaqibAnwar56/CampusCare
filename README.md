@@ -5,7 +5,7 @@ SW315 Software Construction and Development · Lab 16 (Complex Engineering Probl
 CampusCare is a Flask web application where students/faculty report campus maintenance problems,
 maintenance staff resolve assigned tasks, and administrators triage, assign, monitor and report.
 
-**Repository URL:** `<https://github.com/SaqibAnwar56/CampusCare?utm_source=chatgpt.com>`
+**Repository URL:** `<https://github.com/SaqibAnwar56/CampusCare>`
 
 ## Quick start
 
